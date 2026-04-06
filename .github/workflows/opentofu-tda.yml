@@ -2,13 +2,13 @@
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'TDA/**'
-      - 'modules/namespace/**'
-      - '.github/workflows/opentofu-tda.yml'
+#  push:
+#    branches:
+#      - main
+#    paths:
+#      - 'TDA/**'
+#      - 'modules/namespace/**'
+#      - '.github/workflows/opentofu-tda.yml'
 
 jobs:
   plan-apply:
