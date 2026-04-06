@@ -1,0 +1,31 @@
+﻿name: myapp
+create: true
+
+kv:
+  path: kv
+  version: 2
+
+ldap:
+  enabled: true
+  path: ldap
+  description: LDAP auth for myapp
+
+policies:
+  s2: |
+    path "kv/*" {
+      capabilities = ["create", "read", "update", "delete", "list"]
+    }
+
+  tech: |
+    path "sys/internal/ui/resultant-acl" {
+      capabilities = ["read"]
+    }
+
+token_roles:
+  s2:
+    allowed_policies: ["s2"]
+    token_ttl: 3600
+
+  tech:
+    allowed_policies: ["tech"]
+    token_ttl: 3600

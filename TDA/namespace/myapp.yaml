@@ -1,0 +1,48 @@
+﻿application:
+  name: myapp
+
+environments:
+  dev: true
+  int: true
+  acc: false
+
+kv:
+  path: kv
+  version: 2
+
+ldap:
+  enabled: true
+  path: ldap
+  description: LDAP auth for application namespaces
+
+policies:
+  s2: |
+    path "kv/*" {
+      capabilities = ["create", "read", "update", "delete", "list"]
+    }
+
+  developer: |
+    path "kv/data/app/*" {
+      capabilities = ["create", "read", "update", "delete", "list"]
+    }
+
+  tech: |
+    path "sys/internal/ui/resultant-acl" {
+      capabilities = ["read"]
+    }
+
+token_roles:
+  s2:
+    allowed_policies: ["s2"]
+    token_ttl: 3600
+    token_max_ttl: 14400
+
+  developer:
+    allowed_policies: ["developer"]
+    token_ttl: 3600
+    token_max_ttl: 14400
+
+  tech:
+    allowed_policies: ["tech"]
+    token_ttl: 3600
+    token_max_ttl: 14400

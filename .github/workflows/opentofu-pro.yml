@@ -1,0 +1,47 @@
+﻿name: OpenTofu PRO
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'PRO/**'
+      - 'modules/namespace/**'
+      - '.github/workflows/opentofu-pro.yml'
+
+jobs:
+  plan-apply:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: PRO
+
+    env:
+      TF_VAR_vault_address: ${{ secrets.PRO_VAULT_ADDR }}
+      TF_VAR_vault_token: ${{ secrets.PRO_VAULT_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: 1.8.8
+
+      - name: Tofu init
+        run: tofu init
+
+      - name: Tofu fmt check
+        run: tofu fmt -check -recursive
+
+      - name: Tofu validate
+        run: tofu validate
+
+      - name: Tofu plan
+        run: tofu plan -input=false
+
+      - name: Tofu apply
+        if: github.ref == 'refs/heads/main'
+        run: tofu apply -auto-approve -input=false
