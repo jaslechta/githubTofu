@@ -2,13 +2,13 @@
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'LAB/**'
-      - 'modules/namespace/**'
-      - '.github/workflows/opentofu-lab.yml'
+#  push:
+#    branches:
+#      - main
+#    paths:
+#      - 'LAB/**'
+#      - 'modules/namespace/**'
+#      - '.github/workflows/opentofu-lab.yml'
 
 jobs:
   plan-apply:
