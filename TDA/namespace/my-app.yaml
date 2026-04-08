@@ -1,0 +1,56 @@
+application:
+  name: my-app
+
+kv:
+  path: kv
+  version: 2
+
+environments:
+  dev:
+    enabled: true
+    policies:
+      s2: |
+        path "kv/*" {
+          capabilities = ["create", "read", "update", "delete", "list"]
+        }
+
+      developer: |
+        path "kv/*" {
+          capabilities = ["create", "read", "update", "delete", "list"]
+        }
+
+      tech: |
+        path "kv/*" {
+          capabilities = ["read", "list"]
+        }
+
+  int:
+    enabled: true
+    policies:
+      s2: |
+        path "kv/*" {
+          capabilities = ["create", "read", "update", "delete", "list"]
+        }
+
+      developer: |
+        path "kv/*" {
+          capabilities = ["read", "list"]
+        }
+
+      tech: |
+        path "kv/*" {
+          capabilities = ["read", "list"]
+        }
+
+  acc:
+    enabled: true
+    policies:
+      s2: |
+        path "kv/*" {
+          capabilities = ["create", "read", "update", "delete", "list"]
+        }
+
+      tech: |
+        path "kv/*" {
+          capabilities = ["read", "list"]
+        }

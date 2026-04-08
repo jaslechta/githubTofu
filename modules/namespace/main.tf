@@ -1,4 +1,4 @@
-﻿locals {
+locals {
   namespace_enabled = var.create_namespace
 }
 
@@ -22,17 +22,6 @@ resource "vault_mount" "kv" {
   depends_on = [vault_namespace.this]
 }
 
-resource "vault_auth_backend" "ldap" {
-  count = local.namespace_enabled && var.ldap_enabled ? 1 : 0
-
-  namespace   = var.namespace_name
-  type        = "ldap"
-  path        = var.ldap_path
-  description = var.ldap_description
-
-  depends_on = [vault_namespace.this]
-}
-
 resource "vault_policy" "this" {
   for_each = local.namespace_enabled ? var.policies : {}
 
@@ -43,18 +32,18 @@ resource "vault_policy" "this" {
   depends_on = [vault_namespace.this]
 }
 
-resource "vault_token_auth_backend_role" "this" {
-  for_each = local.namespace_enabled ? var.token_roles : {}
+resource "vault_identity_group" "internal" {
+  for_each = local.namespace_enabled ? var.namespace_identity_groups : {}
 
-  namespace              = var.namespace_name
-  role_name              = each.key
-  allowed_policies       = each.value.allowed_policies
-  orphan                 = try(each.value.orphan, true)
-  renewable              = try(each.value.renewable, true)
-  token_period           = try(each.value.token_period, null)
-  token_ttl              = try(each.value.token_ttl, null)
-  token_max_ttl          = try(each.value.token_max_ttl, null)
-  token_explicit_max_ttl = try(each.value.token_explicit_max_ttl, null)
+  namespace        = var.namespace_name
+  name             = each.key
+  type             = "internal"
+  policies         = each.value.policies
+  member_group_ids = each.value.member_group_ids
+  metadata         = try(each.value.metadata, {})
 
-  depends_on = [vault_namespace.this, vault_policy.this]
+  depends_on = [
+    vault_namespace.this,
+    vault_policy.this
+  ]
 }

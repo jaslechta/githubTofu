@@ -1,4 +1,4 @@
-﻿output "namespace_name" {
+output "namespace_name" {
   value = var.namespace_name
 }
 
