@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket  = ""
-    key     = "vault/PRO/terraform.tfstate"
+    key     = "vault/PRO/opentofu.tfstate"
     region  = ""
     encrypt = true
   }
