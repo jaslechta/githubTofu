@@ -1,4 +1,4 @@
-﻿name: demo-lab
+﻿name: test
 create: true
 
 kv:
@@ -8,7 +8,7 @@ kv:
 ldap:
   enabled: true
   path: ldap
-  description: LDAP auth for demo-lab
+  description: LDAP auth for test
 
 policies:
   s2: |
