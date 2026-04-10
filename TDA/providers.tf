@@ -1,4 +1,4 @@
 provider "vault" {
-  address = var.vault_address
+  address = "https://vault.tda.example.com" # REPLACE_ME
   token   = var.vault_token
 }

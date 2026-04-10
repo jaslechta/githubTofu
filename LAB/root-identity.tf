@@ -1,17 +1,17 @@
 resource "vault_ldap_auth_backend" "ldap" {
   path         = "ldap"
-  url          = var.ldap_url
-  userdn       = var.ldap_userdn
-  groupdn      = var.ldap_groupdn
-  binddn       = var.ldap_binddn
+  url          = "ldaps://ldap.example.com"                           # REPLACE_ME
+  userdn       = "OU=Users,DC=example,DC=com"                         # REPLACE_ME
+  groupdn      = "OU=Groups,DC=example,DC=com"                        # REPLACE_ME
+  binddn       = "CN=svc-vault,OU=ServiceAccounts,DC=example,DC=com" # REPLACE_ME
   bindpass     = var.ldap_bindpass
-  userattr     = var.ldap_userattr
-  groupattr    = var.ldap_groupattr
-  groupfilter  = var.ldap_groupfilter
-  insecure_tls = var.ldap_insecure_tls
-  starttls     = var.ldap_starttls
-  discoverdn   = var.ldap_discoverdn
-  upndomain    = var.ldap_upndomain
+  userattr     = "sAMAccountName"
+  groupattr    = "cn"
+  groupfilter  = "(&(objectClass=group)(member={{.UserDN}}))"
+  insecure_tls = false
+  starttls     = false
+  discoverdn   = false
+  upndomain    = ""
 }
 
 data "vault_auth_backend" "ldap" {

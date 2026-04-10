@@ -18,8 +18,8 @@ jobs:
         working-directory: TDA
 
     env:
-      TF_VAR_vault_address: ${{ secrets.TDA_VAULT_ADDR }}
       TF_VAR_vault_token: ${{ secrets.TDA_VAULT_TOKEN }}
+      TF_VAR_ldap_bindpass: ${{ secrets.TDA_LDAP_BINDPASS }}
 
     steps:
       - name: Checkout
@@ -40,8 +40,8 @@ jobs:
         run: tofu validate
 
       - name: Tofu plan
-        run: tofu plan -input=false
+        run: tofu plan -input=false -out=tfplan
 
       - name: Tofu apply
         if: github.ref == 'refs/heads/main'
-        run: tofu apply -auto-approve -input=false
+        run: tofu apply -auto-approve -input=false tfplan
