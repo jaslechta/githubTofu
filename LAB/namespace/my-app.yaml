@@ -10,17 +10,26 @@ environments:
     enabled: true
     policies:
       s2: |
-        path "kv/*" {
+        path "kv/data/*" {
           capabilities = ["create", "read", "update", "delete", "list"]
+        }
+        path "kv/metadata/*" {
+          capabilities = ["read", "list", "delete"]
         }
 
       developer: |
-        path "kv/*" {
+        path "kv/data/*" {
           capabilities = ["create", "read", "update", "delete", "list"]
+        }
+        path "kv/metadata/*" {
+          capabilities = ["read", "list", "delete"]
         }
 
       tech: |
-        path "kv/*" {
+        path "kv/data/*" {
+          capabilities = ["read"]
+        }
+        path "kv/metadata/*" {
           capabilities = ["read", "list"]
         }
 
@@ -28,17 +37,26 @@ environments:
     enabled: true
     policies:
       s2: |
-        path "kv/*" {
+        path "kv/data/*" {
           capabilities = ["create", "read", "update", "delete", "list"]
+        }
+        path "kv/metadata/*" {
+          capabilities = ["read", "list", "delete"]
         }
 
       developer: |
-        path "kv/*" {
+        path "kv/data/*" {
+          capabilities = ["read"]
+        }
+        path "kv/metadata/*" {
           capabilities = ["read", "list"]
         }
 
       tech: |
-        path "kv/*" {
+        path "kv/data/*" {
+          capabilities = ["read"]
+        }
+        path "kv/metadata/*" {
           capabilities = ["read", "list"]
         }
 
@@ -46,11 +64,17 @@ environments:
     enabled: false
     policies:
       s2: |
-        path "kv/*" {
+        path "kv/data/*" {
           capabilities = ["create", "read", "update", "delete", "list"]
+        }
+        path "kv/metadata/*" {
+          capabilities = ["read", "list", "delete"]
         }
 
       tech: |
-        path "kv/*" {
+        path "kv/data/*" {
+          capabilities = ["read"]
+        }
+        path "kv/metadata/*" {
           capabilities = ["read", "list"]
         }

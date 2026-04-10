@@ -12,13 +12,16 @@ ldap:
 
 policies:
   s2: |
-    path "kv/*" {
+    path "kv/data/*" {
       capabilities = ["create", "read", "update", "delete", "list"]
+    }
+    path "kv/metadata/*" {
+      capabilities = ["read", "list", "delete"]
     }
 
   tech: |
     path "sys/internal/ui/resultant-acl" {
-      capabilities = ["read,list"]
+      capabilities = ["read", "list"]
     }
 
 token_roles:
