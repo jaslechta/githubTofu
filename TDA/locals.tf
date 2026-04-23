@@ -29,13 +29,15 @@ locals {
   namespace_list = flatten([
     for _, cfg in local.raw_namespace_configs : [
       for env_name, env_cfg in try(cfg.environments, {}) : {
-        key         = "${env_name}/${cfg.application.name}"
-        name        = "${env_name}/${cfg.application.name}"
-        create      = try(env_cfg.enabled, true)
-        app_name    = cfg.application.name
-        env_name    = env_name
-        kv          = try(cfg.kv, { path = "kv", version = 2 })
-        policies    = try(env_cfg.policies, {})
+        key            = "${env_name}/${cfg.application.name}"
+        name           = "${env_name}/${cfg.application.name}"
+        create         = try(env_cfg.enabled, true)
+        app_name       = cfg.application.name
+        env_name       = env_name
+        kv             = try(cfg.kv, { path = "kv", version = 2 })
+        policies       = try(env_cfg.policies, {})
+        openshift_auth = try(cfg.openshift_auth, null)
+        pki            = try(cfg.pki, null)
 
         namespace_identity_groups = merge(
           contains(keys(try(env_cfg.policies, {})), "s2") ? {

@@ -9,4 +9,6 @@ module "namespace" {
   kv_version                = try(each.value.kv.version, 2)
   policies                  = try(each.value.policies, {})
   namespace_identity_groups = try(each.value.namespace_identity_groups, {})
+  openshift_auth            = try(each.value.openshift_auth, null)
+  pki                       = try(each.value.pki, null)
 }

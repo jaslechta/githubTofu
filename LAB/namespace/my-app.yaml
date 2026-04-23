@@ -1,9 +1,38 @@
 application:
   name: my-app
 
-kv:
-  path: kv
-  version: 2
+openshift_auth:
+  enabled: true
+  path: openshift
+  kubernetes_host: "https://api.cluster.lab.example.com:6443"
+  kubernetes_ca_cert: ""
+  token_reviewer_jwt: ""
+  disable_local_ca_jwt: false
+  issuer: ""
+  role_name: "my-app"
+  bound_service_account_names:
+    - "my-app"
+  bound_service_account_namespaces:
+    - "my-app-dev"
+  audience: "vault"
+  token_policies:
+    - "tech"
+  token_ttl: 3600
+
+pki:
+  enabled: true
+  path: pki
+  role_name: my-app-role
+  allowed_domains:
+    - my-app.apps.lab.example.com
+  allow_subdomains: true
+  allowed_cn:
+    - my-app.apps.lab.example.com
+  dn: "OU=Apps,O=MyCompany,C=CZ"
+  serverdn: "OU=Servers,O=MyCompany,C=CZ"
+  app_support_group: "MS_CZ_LAB_MY-APP_S2"
+  app_support_email: "app-support@example.com"
+  service_account_prefix: "sa-my-app"
 
 environments:
   dev:
@@ -16,7 +45,6 @@ environments:
         path "kv/metadata/*" {
           capabilities = ["read", "list", "delete"]
         }
-
       developer: |
         path "kv/data/*" {
           capabilities = ["create", "read", "update", "delete", "list"]
@@ -24,7 +52,6 @@ environments:
         path "kv/metadata/*" {
           capabilities = ["read", "list", "delete"]
         }
-
       tech: |
         path "kv/data/*" {
           capabilities = ["read"]
@@ -43,7 +70,6 @@ environments:
         path "kv/metadata/*" {
           capabilities = ["read", "list", "delete"]
         }
-
       developer: |
         path "kv/data/*" {
           capabilities = ["read"]
@@ -51,7 +77,6 @@ environments:
         path "kv/metadata/*" {
           capabilities = ["read", "list"]
         }
-
       tech: |
         path "kv/data/*" {
           capabilities = ["read"]
@@ -70,7 +95,6 @@ environments:
         path "kv/metadata/*" {
           capabilities = ["read", "list", "delete"]
         }
-
       tech: |
         path "kv/data/*" {
           capabilities = ["read"]

@@ -1,32 +1,28 @@
-﻿name: OpenTofu PRO
+name: OpenTofu PRO
 
 on:
   workflow_dispatch:
-#  push:
-#    branches:
-#      - main
-#    paths:
-#      - 'PRO/**'
-#      - 'modules/namespace/**'
-#      - '.github/workflows/opentofu-pro.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'PRO/**'
+      - 'modules/**'
+      - '.github/workflows/opentofu-pro.yml'
 
 jobs:
-  plan-apply:
+  plan:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: PRO
-
     env:
       TF_VAR_vault_token: ${{ secrets.PRO_VAULT_TOKEN }}
       TF_VAR_ldap_bindpass: ${{ secrets.PRO_LDAP_BINDPASS }}
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup OpenTofu
-        uses: opentofu/setup-opentofu@v1
+      - uses: opentofu/setup-opentofu@v1
         with:
           tofu_version: 1.8.8
 
@@ -42,6 +38,98 @@ jobs:
       - name: Tofu plan
         run: tofu plan -input=false -out=tfplan
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-pro
+          path: PRO/tfplan
+          retention-days: 1
+
+  detect_features:
+    needs: plan
+    runs-on: ubuntu-latest
+    outputs:
+      needs_pki: ${{ steps.check.outputs.needs_pki }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect PKI in changed namespace files
+        id: check
+        run: |
+          if [ "${{ github.event_name }}" = "push" ] && \
+             git rev-parse "${{ github.event.before }}" > /dev/null 2>&1; then
+            files=$(git diff --name-only "${{ github.event.before }}" HEAD \
+                    | grep '^PRO/namespace/.*\.yaml$' || true)
+          else
+            files=$(find PRO/namespace -name '*.yaml' | sort || true)
+          fi
+
+          needs_pki=false
+          while IFS= read -r f; do
+            [ -z "$f" ] && continue
+            [ ! -f "$f" ] && continue
+            if [ "$(yq '.pki.enabled' "$f")" = "true" ]; then
+              needs_pki=true
+              break
+            fi
+          done <<< "$files"
+
+          echo "needs_pki=${needs_pki}" >> "$GITHUB_OUTPUT"
+
+  apply_standard:
+    needs: detect_features
+    if: needs.detect_features.outputs.needs_pki == 'false' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: PRO
+    env:
+      TF_VAR_vault_token: ${{ secrets.PRO_VAULT_TOKEN }}
+      TF_VAR_ldap_bindpass: ${{ secrets.PRO_LDAP_BINDPASS }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: 1.8.8
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: tfplan-pro
+          path: PRO
+
+      - name: Tofu init
+        run: tofu init
+
       - name: Tofu apply
-        if: github.ref == 'refs/heads/main'
+        run: tofu apply -auto-approve -input=false tfplan
+
+  apply_pki:
+    needs: detect_features
+    if: needs.detect_features.outputs.needs_pki == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: vault-pro-pki
+    defaults:
+      run:
+        working-directory: PRO
+    env:
+      TF_VAR_vault_token: ${{ secrets.PRO_VAULT_TOKEN }}
+      TF_VAR_ldap_bindpass: ${{ secrets.PRO_LDAP_BINDPASS }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: 1.8.8
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: tfplan-pro
+          path: PRO
+
+      - name: Tofu init
+        run: tofu init
+
+      - name: Tofu apply
         run: tofu apply -auto-approve -input=false tfplan
